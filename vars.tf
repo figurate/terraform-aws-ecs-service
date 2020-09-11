@@ -26,7 +26,7 @@ variable "security_groups" {
   default     = []
 }
 
-variable "published_containers" {
+variable "target_groups" {
   description = "A map of container name:port to publish to the specified target group"
   type        = map(any)
   default     = {}
@@ -34,5 +34,20 @@ variable "published_containers" {
 
 variable "code_deploy_enabled" {
   description = "Use CodeDeploy to manage service deployment"
+  default     = false
+}
+
+variable "servicediscovery_enabled" {
+  description = "Create service discovery private zone for the cluster"
+  default     = false
+}
+
+variable "namespace_id" {
+  description = "Service Discovery namespace"
+  default     = null
+}
+
+variable "apigateway_enabled" {
+  description = "Create an API Gateway endpoint for the cluster"
   default     = false
 }

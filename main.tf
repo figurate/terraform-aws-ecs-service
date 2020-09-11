@@ -35,7 +35,7 @@ resource "aws_ecs_service" "service" {
   }
 
   dynamic "load_balancer" {
-    for_each = var.published_containers
+    for_each = var.target_groups
     content {
       container_name   = split(load_balancer.key, ":")[0]
       container_port   = split(load_balancer.key, ":")[0]
@@ -47,6 +47,23 @@ resource "aws_ecs_service" "service" {
     for_each = var.code_deploy_enabled ? [1] : []
     content {
       type = "CODE_DEPLOY"
+    }
+  }
+}
+
+resource "aws_service_discovery_service" "service" {
+  count        = var.servicediscovery_enabled ? 1 : 0
+  name         = var.name
+  namespace_id = var.namespace_id
+  health_check_custom_config {
+    failure_threshold = 1
+  }
+  dns_config {
+    namespace_id   = var.namespace_id
+    routing_policy = "WEIGHTED"
+    dns_records {
+      ttl  = 60
+      type = "A"
     }
   }
 }
