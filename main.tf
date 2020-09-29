@@ -19,6 +19,7 @@ data "aws_ecs_task_definition" "task_definition" {
 }
 
 data "aws_lb_listener" "listener" {
+  count             = var.load_balancer_arn != null ? 1 : 0
   load_balancer_arn = var.load_balancer_arn
   port              = var.load_balancer_port
 }
@@ -70,7 +71,8 @@ resource "aws_lb_target_group" "service" {
 }
 
 resource "aws_lb_listener_rule" "service" {
-  listener_arn = data.aws_lb_listener.listener.arn
+  count        = var.load_balancer_arn != null ? 1 : 0
+  listener_arn = data.aws_lb_listener.listener[0].arn
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.service[0].arn
