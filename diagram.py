@@ -12,13 +12,14 @@ with Diagram("AWS ECS Service", show=False, direction="TB"):
 
     with Cluster("vpc"):
 
-        target_group = ELB("target_group (+)")
+        target_group = ELB("target group (*)")
+        listener_rule = ELB("listener rule (*)")
 
     with Cluster("ecs"):
 
      service = ECS("ecs service")
      api_gw >> service >> cloud_map
 
-     service >> Edge(label="container:port (+)") >> target_group
+     service >> listener_rule >> target_group
 
-    Blank("+ 1..n")
+    Blank("* 0..1")
