@@ -25,8 +25,8 @@ data "aws_lb" "load_balancer" {
 }
 
 data "aws_lb_listener" "listener" {
-  for_each          = data.aws_lb.load_balancer
-  load_balancer_arn = each.value.arn
+  count             = length(data.aws_lb.load_balancer)
+  load_balancer_arn = data.aws_lb.load_balancer[count.index].arn
   port              = var.load_balancer_port
 }
 
@@ -64,7 +64,7 @@ resource "aws_ecs_service" "service" {
 }
 
 resource "aws_lb_target_group" "service" {
-  for_each    = data.aws_lb.load_balancer
+  count       = length(data.aws_lb.load_balancer)
   name_prefix = var.name
   vpc_id      = data.aws_vpc.tenant.id
   protocol    = "HTTPS"
@@ -77,8 +77,8 @@ resource "aws_lb_target_group" "service" {
 }
 
 resource "aws_lb_listener_rule" "service" {
-  for_each     = data.aws_lb_listener.listener
-  listener_arn = each.value.arn
+  count        = length(data.aws_lb_listener.listener)
+  listener_arn = data.aws_lb_listener.listener[count.index].arn
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.service[0].arn
