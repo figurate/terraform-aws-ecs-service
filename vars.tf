@@ -7,7 +7,7 @@ variable "cluster" {
 }
 
 variable "task_definition" {
-  description = "ARN of an ECS task definition"
+  description = "The family, family:revision or ARN of an ECS task definition"
 }
 
 variable "vpc_default" {
@@ -24,6 +24,11 @@ variable "vpc_tags" {
 variable "security_groups" {
   description = "A list of security group ids applied to the service"
   default     = []
+}
+
+variable "load_balancer" {
+  description = "Name of a load balancer used to route traffic to the service"
+  default     = null
 }
 
 variable "load_balancer_arn" {

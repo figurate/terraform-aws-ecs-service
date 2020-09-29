@@ -18,9 +18,15 @@ data "aws_ecs_task_definition" "task_definition" {
   task_definition = var.task_definition
 }
 
+data "aws_lb" "load_balancer" {
+  count = var.load_balancer != null || var.load_balancer_arn != null ? 1 : 0
+  arn   = var.load_balancer_arn
+  name  = var.load_balancer
+}
+
 data "aws_lb_listener" "listener" {
-  count             = var.load_balancer_arn != null ? 1 : 0
-  load_balancer_arn = var.load_balancer_arn
+  for_each          = data.aws_lb.load_balancer
+  load_balancer_arn = each.value.arn
   port              = var.load_balancer_port
 }
 
@@ -41,7 +47,7 @@ resource "aws_ecs_service" "service" {
   }
 
   dynamic "load_balancer" {
-    for_each = var.load_balancer_arn != null ? [1] : []
+    for_each = data.aws_lb.load_balancer
     content {
       container_name   = var.target_container
       container_port   = var.target_port
@@ -58,7 +64,7 @@ resource "aws_ecs_service" "service" {
 }
 
 resource "aws_lb_target_group" "service" {
-  count       = var.load_balancer_arn != null ? 1 : 0
+  for_each    = data.aws_lb.load_balancer
   name_prefix = var.name
   vpc_id      = data.aws_vpc.tenant.id
   protocol    = "HTTPS"
@@ -71,8 +77,8 @@ resource "aws_lb_target_group" "service" {
 }
 
 resource "aws_lb_listener_rule" "service" {
-  count        = var.load_balancer_arn != null ? 1 : 0
-  listener_arn = data.aws_lb_listener.listener[0].arn
+  for_each     = data.aws_lb_listener.listener
+  listener_arn = each.value.arn
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.service[0].arn
