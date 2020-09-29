@@ -5,7 +5,7 @@ variable "cluster" {
 
 variable "task_definition" {
   description = "The family, family:revision or ARN of an ECS task definition"
-  default     = "nginx"
+  default     = "example-nginx-default"
 }
 
 variable "load_balancer" {
