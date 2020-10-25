@@ -82,3 +82,7 @@ variable "apigateway_enabled" {
   description = "Create an API Gateway endpoint for the cluster"
   default     = false
 }
+
+locals {
+  lb_count = var.load_balancer != null || var.load_balancer_arn != null ? 1 : 0
+}
