@@ -2,3 +2,5 @@
 .idea
 .terraform
 terraform-aws-ecs-service.iml
+*.tfvars
+*tfstate*
