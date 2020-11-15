@@ -1,7 +1,7 @@
 SHELL:=/bin/bash
 AWS_DEFAULT_REGION?=ap-southeast-2
 
-TERRAFORM_VERSION=0.12.24
+TERRAFORM_VERSION=0.13.4
 TERRAFORM=docker run --rm -v "${PWD}:/work" -v "${HOME}:/root" -e AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION) -e http_proxy=$(http_proxy) --net=host -w /work hashicorp/terraform:$(TERRAFORM_VERSION)
 
 TERRAFORM_DOCS=docker run --rm -v "${PWD}:/work" tmknom/terraform-docs
@@ -38,7 +38,8 @@ docs: diagram
 format:
 	$(TERRAFORM) fmt -list=true ./ && \
 		$(TERRAFORM) fmt -list=true ./examples/load_balancer && \
-		$(TERRAFORM) fmt -list=true ./examples/nginx
+		$(TERRAFORM) fmt -list=true ./examples/nginx && \
+		$(TERRAFORM) fmt -list=true ./examples/apachesling
 
 example:
 	$(TERRAFORM) init examples/$(EXAMPLE) && $(TERRAFORM) plan -input=false examples/$(EXAMPLE)

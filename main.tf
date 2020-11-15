@@ -25,14 +25,14 @@ data "aws_lb" "load_balancer" {
 }
 
 data "aws_lb_listener" "listener" {
-  count = local.lb_count
+  count             = local.lb_count
   load_balancer_arn = data.aws_lb.load_balancer[count.index].arn
   port              = var.load_balancer_port
 }
 
 resource "aws_ecs_service" "service" {
   name                              = var.name
-  task_definition = var.task_definition
+  task_definition                   = var.task_definition
   cluster                           = var.cluster
   desired_count                     = 1
   force_new_deployment              = false
@@ -66,7 +66,7 @@ resource "aws_ecs_service" "service" {
   dynamic "service_registries" {
     for_each = var.servicediscovery_enabled ? [1] : []
     content {
-      registry_arn = aws_service_discovery_service.service[0].arn
+      registry_arn   = aws_service_discovery_service.service[0].arn
       container_name = "apache-sling"
       container_port = 8080
     }
@@ -74,7 +74,7 @@ resource "aws_ecs_service" "service" {
 }
 
 resource "aws_lb_target_group" "service" {
-  count = local.lb_count
+  count       = local.lb_count
   name_prefix = var.name
   vpc_id      = data.aws_vpc.tenant.id
   protocol    = "HTTPS"
@@ -87,7 +87,7 @@ resource "aws_lb_target_group" "service" {
 }
 
 resource "aws_lb_listener_rule" "service" {
-  count = local.lb_count
+  count        = local.lb_count
   listener_arn = data.aws_lb_listener.listener[count.index].arn
   action {
     type             = "forward"
