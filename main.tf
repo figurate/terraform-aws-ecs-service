@@ -62,6 +62,15 @@ resource "aws_ecs_service" "service" {
       type = "CODE_DEPLOY"
     }
   }
+
+  dynamic "service_registries" {
+    for_each = var.servicediscovery_enabled ? [1] : []
+    content {
+      registry_arn = aws_service_discovery_service.service[0].arn
+      container_name = "apache-sling"
+      container_port = 8080
+    }
+  }
 }
 
 resource "aws_lb_target_group" "service" {
@@ -103,10 +112,10 @@ resource "aws_service_discovery_service" "service" {
   }
   dns_config {
     namespace_id   = var.namespace_id
-    routing_policy = "WEIGHTED"
+    routing_policy = "MULTIVALUE"
     dns_records {
-      ttl  = 60
-      type = "A"
+      ttl  = 30
+      type = "SRV"
     }
   }
 }
