@@ -10,8 +10,11 @@ data "aws_vpc" "tenant" {
   tags    = var.vpc_tags
 }
 
-data "aws_subnet_ids" "tenant" {
-  vpc_id = data.aws_vpc.tenant.id
+data "aws_subnets" "tenant" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.tenant.id]
+  }
 }
 
 data "aws_ecs_task_definition" "task_definition" {
@@ -42,7 +45,7 @@ resource "aws_ecs_service" "service" {
   dynamic "network_configuration" {
     for_each = data.aws_ecs_task_definition.task_definition.network_mode == "awsvpc" ? [1] : []
     content {
-      subnets         = data.aws_subnet_ids.tenant.ids
+      subnets         = data.aws_subnets.tenant.ids
       security_groups = var.security_groups
     }
   }

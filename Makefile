@@ -11,7 +11,7 @@ clean:
 	rm -rf .terraform/
 
 validate:
-	$(TERRAFORM) init && $(TERRAFORM) validate
+	$(TERRAFORM) init -upgrade && $(TERRAFORM) validate
 
 test: validate
 	$(CHECKOV) -d /work
